@@ -236,10 +236,7 @@ static bool retransmits_timed_out(struct sock *sk,
 			rto_base = tcp_timeout_init(sk);
 		timeout = tcp_model_timeout(sk, boundary, rto_base);
 	}
-<<<<<<< HEAD
 
-=======
->>>>>>> eb6eeb056c99 (tcp: address problems caused by EDT misshaps)
 	return (s32)(tcp_time_stamp(tcp_sk(sk)) - start_ts - timeout) >= 0;
 }
 
