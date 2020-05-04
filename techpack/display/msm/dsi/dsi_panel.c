@@ -4137,6 +4137,8 @@ int dsi_panel_get_mode(struct dsi_panel *panel,
 #ifdef CONFIG_DRM_SDE_SPECIFIC_PANEL
 		mode->default_timing = of_property_read_bool(child_np,
 				"qcom,mdss-dsi-timing-default");
+		mode->splash_dms = of_property_read_bool(child_np,
+				"qcom,mdss-dsi-splash-dms-switch-to-this-timing");
 #endif /* CONFIG_DRM_SDE_SPECIFIC_PANEL */
 	}
 	goto done;
