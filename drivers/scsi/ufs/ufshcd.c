@@ -11105,6 +11105,7 @@ int ufshcd_shutdown(struct ufs_hba *hba)
 	ufshcd_scsi_unblock_requests(hba);
 	ufshcd_release_all(hba);
 	ret = ufshcd_suspend(hba, UFS_SHUTDOWN_PM);
+
 out:
 	if (ret)
 		dev_err(hba->dev, "%s failed, err %d\n", __func__, ret);
