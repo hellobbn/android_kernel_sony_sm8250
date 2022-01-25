@@ -468,13 +468,8 @@ static int crng_init = 0;
 #define crng_ready() (likely(crng_init > 1))
 static int crng_init_cnt = 0;
 static unsigned long crng_global_init_time = 0;
-<<<<<<< HEAD
-#define CRNG_INIT_CNT_THRESH (2*CHACHA_KEY_SIZE)
+#define CRNG_INIT_CNT_THRESH (2 * CHACHA_KEY_SIZE)
 static void _extract_crng(struct crng_state *crng, u8 out[CHACHA_BLOCK_SIZE]);
-=======
-#define CRNG_INIT_CNT_THRESH (2 * CHACHA20_KEY_SIZE)
-static void _extract_crng(struct crng_state *crng, u8 out[CHACHA20_BLOCK_SIZE]);
->>>>>>> ccb9e677078b (random: access input_pool_data directly rather than through pointer)
 static void _crng_backtrack_protect(struct crng_state *crng,
 				    u8 tmp[CHACHA_BLOCK_SIZE], int used);
 static void process_random_ready_list(void);
@@ -2183,12 +2178,14 @@ void add_hwgenerator_randomness(const char *buffer, size_t count,
 			return;
 	}
 
-	/* Suspend writing if we're above the trickle threshold.
+	/* Throttle writing if we're above the trickle threshold.
 	 * We'll be woken up again once below random_write_wakeup_thresh,
-	 * or when the calling thread is about to terminate.
+	 * when the calling thread is about to terminate, or once
+	 * CRNG_RESEED_INTERVAL has lapsed.
 	 */
-	wait_event_interruptible(random_write_wait, kthread_should_stop() ||
-			POOL_ENTROPY_BITS() <= random_write_wakeup_bits);
+	wait_event_interruptible_timeout(random_write_wait, kthread_should_stop() ||
+			POOL_ENTROPY_BITS() <= random_write_wakeup_bits,
+			CRNG_RESEED_INTERVAL);
 	mix_pool_bytes(buffer, count);
 	credit_entropy_bits(entropy);
 }
