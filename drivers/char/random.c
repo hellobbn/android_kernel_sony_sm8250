@@ -949,6 +949,7 @@ static void crng_reseed(struct crng_state *crng, bool use_input_pool)
 	memzero_explicit(&buf, sizeof(buf));
 	WRITE_ONCE(crng->init_time, jiffies);
 	spin_unlock_irqrestore(&crng->lock, flags);
+<<<<<<< HEAD
 	if (crng == &primary_crng && crng_init < 2) {
 		invalidate_batched_entropy();
 		numa_crng_init();
@@ -968,6 +969,10 @@ static void crng_reseed(struct crng_state *crng, bool use_input_pool)
 			urandom_warning.missed = 0;
 		}
 	}
+=======
+	if (crng == &primary_crng && crng_init < 2)
+		crng_finalize_init();
+>>>>>>> 4987ee1fdc75 (random: only call crng_finalize_init() for primary_crng)
 }
 
 static void _extract_crng(struct crng_state *crng, u8 out[CHACHA_BLOCK_SIZE])
