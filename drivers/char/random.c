@@ -472,8 +472,8 @@ static void crng_pre_init_inject(const void *input, size_t len, bool account)
 
 static void _get_random_bytes(void *buf, size_t nbytes)
 {
-	u32 chacha_state[CHACHA20_BLOCK_SIZE / sizeof(u32)];
-	u8 tmp[CHACHA20_BLOCK_SIZE];
+	u32 chacha_state[CHACHA_BLOCK_SIZE / sizeof(u32)];
+	u8 tmp[CHACHA_BLOCK_SIZE];
 	size_t len;
 
 	if (!nbytes)
@@ -485,7 +485,7 @@ static void _get_random_bytes(void *buf, size_t nbytes)
 	buf += len;
 
 	while (nbytes) {
-		if (nbytes < CHACHA20_BLOCK_SIZE) {
+		if (nbytes < CHACHA_BLOCK_SIZE) {
 			chacha20_block(chacha_state, tmp);
 			memcpy(buf, tmp, nbytes);
 			memzero_explicit(tmp, sizeof(tmp));
@@ -495,8 +495,8 @@ static void _get_random_bytes(void *buf, size_t nbytes)
 		chacha20_block(chacha_state, buf);
 		if (unlikely(chacha_state[12] == 0))
 			++chacha_state[13];
-		nbytes -= CHACHA20_BLOCK_SIZE;
-		buf += CHACHA20_BLOCK_SIZE;
+		nbytes -= CHACHA_BLOCK_SIZE;
+		buf += CHACHA_BLOCK_SIZE;
 	}
 
 	memzero_explicit(chacha_state, sizeof(chacha_state));
@@ -523,9 +523,7 @@ EXPORT_SYMBOL(get_random_bytes);
 
 static ssize_t get_random_bytes_user(void __user *buf, size_t nbytes)
 {
-	bool large_request = nbytes > 256;
-	ssize_t ret = 0;
-	size_t len;
+	size_t len, left, ret = 0;
 	u32 chacha_state[CHACHA_BLOCK_SIZE / sizeof(u32)];
 	u8 output[CHACHA_BLOCK_SIZE];
 
@@ -544,39 +542,40 @@ static ssize_t get_random_bytes_user(void __user *buf, size_t nbytes)
 	 * the user directly.
 	 */
 	if (nbytes <= CHACHA_KEY_SIZE) {
-		ret = copy_to_user(buf, &chacha_state[4], nbytes) ? -EFAULT : nbytes;
+		ret = nbytes - copy_to_user(buf, &chacha_state[4], nbytes);
 		goto out_zero_chacha;
 	}
 
-	do {
-		if (large_request) {
-			if (signal_pending(current)) {
-				if (!ret)
-					ret = -ERESTARTSYS;
-				break;
-			}
-			cond_resched();
-		}
-
+	for (;;) {
 		chacha20_block(chacha_state, output);
 		if (unlikely(chacha_state[12] == 0))
 			++chacha_state[13];
 
 		len = min_t(size_t, nbytes, CHACHA_BLOCK_SIZE);
-		if (copy_to_user(buf, output, len)) {
-			ret = -EFAULT;
+		left = copy_to_user(buf, output, len);
+		if (left) {
+			ret += len - left;
 			break;
 		}
 
-		nbytes -= len;
 		buf += len;
 		ret += len;
-	} while (nbytes);
+		nbytes -= len;
+		if (!nbytes)
+			break;
+
+		BUILD_BUG_ON(PAGE_SIZE % CHACHA_BLOCK_SIZE != 0);
+		if (ret % PAGE_SIZE == 0) {
+			if (signal_pending(current))
+				break;
+			cond_resched();
+		}
+	}
 
 	memzero_explicit(output, sizeof(output));
 out_zero_chacha:
 	memzero_explicit(chacha_state, sizeof(chacha_state));
-	return ret;
+	return ret ? ret : -EFAULT;
 }
 
 /*
@@ -592,10 +591,10 @@ struct batched_entropy {
 		 * remaining 32 bytes from fast key erasure, plus one full
 		 * block from the detached ChaCha state. We can increase
 		 * the size of this later if needed so long as we keep the
-		 * formula of (integer_blocks + 0.5) * CHACHA20_BLOCK_SIZE.
+		 * formula of (integer_blocks + 0.5) * CHACHA_BLOCK_SIZE.
 		 */
-		u64 entropy_u64[CHACHA20_BLOCK_SIZE * 3 / (2 * sizeof(u64))];
-		u32 entropy_u32[CHACHA20_BLOCK_SIZE * 3 / (2 * sizeof(u32))];
+		u64 entropy_u64[CHACHA_BLOCK_SIZE * 3 / (2 * sizeof(u64))];
+		u32 entropy_u32[CHACHA_BLOCK_SIZE * 3 / (2 * sizeof(u32))];
 	};
 	unsigned long generation;
 	unsigned int position;
