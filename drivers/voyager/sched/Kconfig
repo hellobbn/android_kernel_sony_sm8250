@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config SCHED_EXT
+	tristate "Support sched extention"
+	help
+	This will enable the features ported from the upstream.
+
+config SCHED_EXT_DEBUG
+	tristate "Support sched extention debug"
+	help
+	This will debug the features ported from the upstream.
+
+source "drivers/voyager/sched/walt/Kconfig"

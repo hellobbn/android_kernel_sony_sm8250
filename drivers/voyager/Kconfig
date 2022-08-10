@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config VOYAGER_ADDON
+	tristate "Enable special features added by voyager kernel"
+	help
+	This will enable additional features.
+
+
+source "drivers/voyager/sched/Kconfig"

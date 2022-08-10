@@ -143,7 +143,34 @@ struct sched_cluster {
 	unsigned int max_possible_freq;
 	bool freq_init_done;
 	u64 aggr_grp_load;
+
+	u16			util_to_cost[1024]; /* Voyager kernel Added, walt needed */
 };
+
+struct find_best_target_env {
+	int placement_boost;
+	int need_idle;
+	int fastpath;
+	int start_cpu;
+	int skip_cpu;
+	int order_index;
+	int end_index;
+	bool is_rtg;
+	bool boosted;
+	bool strict_max;
+	u64 prs[8];
+};
+
+enum fastpaths {
+	NONE = 0,
+	SYNC_WAKEUP,
+	PREV_CPU_FASTPATH,
+#if IS_ENABLED(CONFIG_MIHW)
+	SCHED_BIG_TOP,
+#endif
+};
+
+extern int num_sched_clusters;
 
 extern cpumask_t asym_cap_sibling_cpus;
 #endif /* CONFIG_SCHED_WALT */

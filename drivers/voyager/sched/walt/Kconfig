@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config WALT_EXT
+	tristate "Support window based load tracking extention"
+	help
+	This will enable the features ported from the upstream walt module.
