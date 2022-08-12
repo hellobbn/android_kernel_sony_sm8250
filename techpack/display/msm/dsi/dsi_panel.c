@@ -17,6 +17,7 @@
 
 #ifdef CONFIG_DRM_SDE_SPECIFIC_PANEL
 #include "dsi_panel_driver.h"
+#include "sec_interface.h"
 #endif /* CONFIG_DRM_SDE_SPECIFIC_PANEL */
 
 /**
@@ -4291,6 +4292,7 @@ int dsi_panel_set_lp1(struct dsi_panel *panel)
 	} else {
 		panel->spec_pdata->aod_mode = 1;
 		pr_notice("%s: set AOD mode ON\n", __func__);
+		sec_ts_lpmode_enable();
 	}
 #else
 	if (rc)
@@ -4353,6 +4355,7 @@ int dsi_panel_set_nolp(struct dsi_panel *panel)
 	} else {
 		panel->spec_pdata->aod_mode = 0;
 		pr_notice("%s: set AOD mode OFF\n", __func__);
+		sec_ts_lpmode_disable();
 	}
 #else
 	if (rc)
