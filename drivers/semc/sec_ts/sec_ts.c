@@ -2065,6 +2065,13 @@ err:
 	return -EINVAL;
 }
 
+static struct sec_ts_data *ts_data;
+
+struct sec_ts_data *get_sec_ts_data(void)
+{
+	return ts_data;
+}
+
 static int sec_ts_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
 	struct sec_ts_data *ts;
@@ -2111,6 +2118,7 @@ static int sec_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
 	}
 
 	ts = kzalloc(sizeof(struct sec_ts_data), GFP_KERNEL);
+	ts_data = ts;
 	if (!ts)
 		goto error_allocate_mem;
 
