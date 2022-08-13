@@ -20,11 +20,6 @@ static void sec_ts_lowpowermode_set(int state) {
 
 	mutex_lock(&ts->aod_mutex);
 
-	// Return early if already in the requested state
-	if (ts->lowpower_mode == state) {
-		goto exit;
-	}
-
 	if (sec_ts_get_pw_status() || !ts->after_work.done || (ts->power_status == SEC_TS_STATE_POWER_OFF)) {
 		ts->aod_pending = true;
 		ts->aod_pending_lowpower_mode = state;
