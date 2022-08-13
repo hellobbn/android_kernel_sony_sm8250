@@ -9,7 +9,7 @@
 #ifndef _SEC_INTERFACE_H_
 #define _SEC_INTERFACE_H_
 
-int sec_ts_lpmode_enable(void);
-int sec_ts_lpmode_disable(void);
+void sec_ts_lpmode_enable(void);
+void sec_ts_lpmode_disable(void);
 
 #endif /* _SEC_INTERFACE_H_ */
