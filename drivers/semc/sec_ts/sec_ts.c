@@ -2769,9 +2769,28 @@ int sec_ts_set_lowpowermode(struct sec_ts_data *ts, u8 mode)
 	int retrycnt = 0;
 	//u8 data;
 	char para = 0;
+	char curr_mode;
 
 	input_info(true, &ts->client->dev, "%s: %s(%X)\n", __func__,
 			mode == TO_LOWPOWER_MODE ? "ENTER" : "EXIT", ts->lowpower_mode);
+
+	// Reead current power mode
+	ret = sec_ts_i2c_read(ts, SEC_TS_CMD_SET_POWER_MODE, &curr_mode, 1);
+	if (ret < 0) {
+		input_err(true, &ts->client->dev, "%s: read power mode failed!\n", __func__);
+		goto i2c_error;
+	}
+
+	// Only set ts's mode is already in targeted mode
+	if (curr_mode == mode) {
+		if (ts->lowpower_mode != mode)
+				ts->lowpower_mode = mode;
+
+		return 0;
+	}
+
+	sec_ts_delay(50);
+
 	/*
 	if (mode) {
 		#ifdef SEC_TS_SUPPORT_CUSTOMLIB
