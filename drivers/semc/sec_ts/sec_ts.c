@@ -3047,7 +3047,7 @@ int sec_ts_start_device(struct sec_ts_data *ts)
 	}
 
 	if (ts->plat_data->sod_mode.status && ts->power_status == SEC_TS_STATE_LPM) {
-		// sec_ts_set_lowpowermode(ts, TO_TOUCH_MODE);
+		sec_ts_set_lowpowermode(ts, TO_TOUCH_MODE);
 		return 0;
 	}
 
