@@ -347,7 +347,23 @@
 	};
 
 	chosen {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
 		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7 kpti=off";
+
+		stdout-path = "framebuffer";
+
+		framebuffer: framebuffer@9c000000 {
+			compatible = "simple-framebuffer";
+			reg = <0 0x9c000000 0 0x2300000>;
+			width = <1644>;
+			height = <3840>;
+			stride = <(1644 * 4)>;
+			format = "a8r8g8b8";
+			status = "okay";
+		};
 	};
 
 	firmware: firmware {
@@ -513,12 +529,14 @@
 
 		cont_splash_memory: cont_splash_region@9c000000 {
 			reg = <0x0 0x9c000000 0x0 0x02300000>;
-			label = "cont_splash_region";
+			// label = "cont_splash_region";
+			no-map;
 		};
 
 		disp_rdump_memory: disp_rdump_region@9c000000 {
 			reg = <0x0 0x9c000000 0x0 0x00800000>;
-			label = "disp_rdump_region";
+			// label = "disp_rdump_region";
+			no-map;
 		};
 
 		dfps_data_memory: dfps_data_region@9e300000 {
