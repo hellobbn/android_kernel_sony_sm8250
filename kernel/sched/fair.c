@@ -23,6 +23,8 @@
 #include "sched.h"
 
 #include <trace/events/sched.h>
+
+#define CREATE_TRACE_POINTS
 #include <trace/hooks/sched.h>
 
 #include "walt.h"
