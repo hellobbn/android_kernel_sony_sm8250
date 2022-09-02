@@ -885,3 +885,5 @@ config FORCE_ALLOC_FROM_DMA_ZONE
 	  always using ZONE_DMA32 memory.
 
 	  If unsure, say "n".
+
+source "mm/xreclaimer/Kconfig"
