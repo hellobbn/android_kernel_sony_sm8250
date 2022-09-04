@@ -220,6 +220,7 @@
 				somc,mdss-dsi-hmd-off-command-state = "dsi_hs_mode";
 			};
 			timing@1 {
+				qcom,mdss-dsi-splash-dms-switch-to-this-timing;
 				qcom,mdss-dsi-panel-width = <1644>;
 				qcom,mdss-dsi-panel-height = <3840>;
 				qcom,mdss-dsi-h-back-porch = <8>;
